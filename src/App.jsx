@@ -8,7 +8,7 @@ import Heatmap from './components/Heatmap';
 import WarriorTemplates from './components/WarriorTemplates';
 import Insights from './components/Insights';
 import Modal from './components/Modal';
-import { Flame, Lock, User, LayoutDashboard, BarChart3, Trash2, Edit3, Sword } from 'lucide-react';
+import { Flame, Lock, LayoutDashboard, BarChart3, Trash2, Edit3, Sword } from 'lucide-react';
 
 function App() {
   const { habits, toggleHabit, deleteHabit, updateHabit, userProfile, setUserId, checkTrialStatus } = useHabitStore();
@@ -22,7 +22,8 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) { setUserId(user.uid); } else { setUserId(null); }
-      setLoading(false);
+      // Thoda delay taaki loading animation dikhe
+      setTimeout(() => setLoading(false), 2000);
     });
     checkTrialStatus();
     return () => unsubscribe();
@@ -39,9 +40,23 @@ function App() {
     setEditingHabit(null);
   };
 
+  // ELITE LOADING SCREEN
   if (loading) return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
-      <div className="text-blood-600 font-black italic animate-pulse tracking-[0.5em] text-[10px]">RECALIBRATING...</div>
+    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-10">
+      <div className="relative mb-12">
+        <div className="absolute inset-0 bg-blood-600/30 rounded-full animate-pulse-glow"></div>
+        <img 
+          src="/logo.png" 
+          alt="Iron Discipline" 
+          className="w-28 h-28 relative z-10 drop-shadow-[0_0_25px_rgba(220,38,38,0.8)]"
+        />
+      </div>
+      <div className="w-48 h-[2px] bg-iron-900 rounded-full overflow-hidden relative">
+        <div className="absolute inset-0 bg-blood-600 animate-loading"></div>
+      </div>
+      <p className="mt-6 text-blood-600 font-black italic tracking-[0.5em] text-[9px] uppercase animate-pulse">
+        Initializing War Room...
+      </p>
     </div>
   );
 
@@ -50,15 +65,10 @@ function App() {
   const completedToday = habits.filter(h => h.completedDays.includes(today)).length;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white p-4 pb-32 max-w-md mx-auto font-sans">
+    <div className="min-h-screen bg-[#050505] text-white p-4 pb-32 max-w-md mx-auto font-sans selection:bg-blood-600">
       <header className="flex justify-between items-center mb-10 p-2">
         <div className="flex items-center gap-3">
-          {/* NAYA LOGO INTEGRATION */}
-          <img 
-            src="/logo.png" 
-            alt="Iron Discipline Logo" 
-            className="w-10 h-10 drop-shadow-[0_0_8px_rgba(220,38,38,0.8)] object-contain"
-          />
+          <img src="/logo.png" alt="Logo" className="w-10 h-10 drop-shadow-[0_0_8px_rgba(220,38,38,0.8)] object-contain" />
           <h1 className="text-2xl font-black uppercase tracking-tighter italic leading-tight">
             Iron<br/><span className="text-blood-600">Discipline</span>
           </h1>
@@ -75,9 +85,7 @@ function App() {
         {activeTab === 'missions' ? (
           <>
             <section className="flex flex-col items-center my-6 bg-gradient-to-b from-iron-800/30 to-black p-12 rounded-[3.5rem] border border-iron-800/50 relative overflow-hidden">
-               <div className="absolute top-6 right-8 text-[9px] font-black text-iron-700 tracking-widest uppercase italic text-right leading-tight">
-                 Siege<br/>Active
-               </div>
+               <div className="absolute top-6 right-8 text-[9px] font-black text-iron-700 tracking-widest uppercase italic text-right leading-tight">Siege<br/>Active</div>
                <ProgressOrbit completed={completedToday} total={habits.length} />
                <div className="mt-8 text-center">
                  <h2 className="text-3xl font-black uppercase italic tracking-tighter">Day <span className="text-blood-600 italic">One</span></h2>
@@ -152,7 +160,7 @@ function App() {
       <nav className="fixed bottom-10 left-1/2 -translate-x-1/2 w-[80%] bg-iron-900/40 border border-iron-700/30 backdrop-blur-3xl flex justify-around p-3 rounded-[2.5rem] z-40 shadow-[0_30px_60px_rgba(0,0,0,0.9)]">
         <button onClick={() => setActiveTab('missions')} className={`flex items-center gap-3 px-8 py-3 rounded-2xl transition-all duration-700 ${activeTab === 'missions' ? 'bg-blood-600 text-white shadow-[0_0_25px_rgba(220,38,38,0.5)]' : 'text-iron-700'}`}>
           <LayoutDashboard className="w-5 h-5" />
-          <span className="text-[10px] font-black uppercase tracking-widest">{activeTab === 'missions' ? 'Missions' : ''}</span>
+          <span className="text-[10px] font-black uppercase tracking-widest">{activeTab === 'missions' ? 'Siege' : ''}</span>
         </button>
         <button onClick={() => setActiveTab('insights')} className={`flex items-center gap-3 px-8 py-3 rounded-2xl transition-all duration-700 ${activeTab === 'insights' ? 'bg-blood-600 text-white shadow-[0_0_25px_rgba(220,38,38,0.5)]' : 'text-iron-700'}`}>
           <BarChart3 className="w-5 h-5" />
