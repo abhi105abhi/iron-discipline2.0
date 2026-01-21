@@ -7,19 +7,40 @@
 }
 
 body {
-  @apply bg-iron-900 text-white selection:bg-blood-600 selection:text-white;
+  @apply bg-[#050505] text-white selection:bg-blood-600 selection:text-white;
   margin: 0;
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Scrollbar for that elite feel */
+/* Custom Scrollbar for the War Room */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-iron-900;
+  @apply bg-black;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-iron-700 rounded-full hover:bg-blood-600;
+  @apply bg-iron-800 rounded-full hover:bg-blood-600 transition-colors;
+}
+
+/* Loading Bar Animation */
+@keyframes loading {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-loading {
+  animation: loading 2s ease-in-out infinite;
+}
+
+/* Pulsing Glow for Logo */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; transform: scale(1); filter: blur(40px); }
+  50% { opacity: 1; transform: scale(1.1); filter: blur(60px); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
 }
