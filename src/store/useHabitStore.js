@@ -11,20 +11,31 @@ export const useHabitStore = create(
         { id: '2', name: 'DEEP WORK (4 HOURS)', completedDays: [], targetDays: 21 },
         { id: '3', name: '5 AM WAKEUP', completedDays: [], targetDays: 60 }
       ],
-      userProfile: { uid: null, joinDate: new Date().toISOString(), isPremium: false, trialEnded: false },
+      userProfile: {
+        uid: null,
+        joinDate: new Date().toISOString(),
+        isPremium: false,
+        trialEnded: false
+      },
 
-      setUserId: (uid) => set((state) => ({ userProfile: { ...state.userProfile, uid } })),
+      setUserId: (uid) => set((state) => ({
+        userProfile: { ...state.userProfile, uid }
+      })),
 
       syncToFirebase: async (updatedHabits) => {
         const { uid } = get().userProfile;
         if (uid) {
           try {
-            await setDoc(doc(db, "users", uid), { habits: updatedHabits, lastUpdated: new Date().toISOString() }, { merge: true });
-          } catch (error) { console.error("Sync failed:", error); }
+            await setDoc(doc(db, "users", uid), {
+              habits: updatedHabits,
+              lastUpdated: new Date().toISOString()
+            }, { merge: true });
+          } catch (error) {
+            console.error("Warrior, Sync failed:", error);
+          }
         }
       },
 
-      // Naya parameter: target
       addHabit: async (name, target = 30) => {
         const newHabit = {
           id: Date.now().toString(),
@@ -59,12 +70,24 @@ export const useHabitStore = create(
         set({ habits: updatedHabits });
         await get().syncToFirebase(updatedHabits);
       },
-      
+
       checkTrialStatus: () => {
         const { joinDate, isPremium } = get().userProfile;
         const diffInDays = Math.floor((new Date() - new Date(joinDate)) / (1000 * 60 * 60 * 24));
-        if (diffInDays > 15 && !isPremium) set((state) => ({ userProfile: { ...state.userProfile, trialEnded: true } }));
+        if (diffInDays > 15 && !isPremium) {
+          set((state) => ({
+            userProfile: { ...state.userProfile, trialEnded: true }
+          }));
+        }
       },
+
+      getWarriorTitle: (percentage) => {
+        if (percentage <= 20) return "NOVICE";
+        if (percentage <= 40) return "SOLDIER";
+        if (percentage <= 60) return "COMMANDER";
+        if (percentage <= 80) return "ELITE";
+        return "BEAST";
+      }
     }),
     { name: 'iron-discipline-storage' }
   )
