@@ -48,6 +48,7 @@ export const useHabitStore = create(
         await get().syncToFirebase(updatedHabits);
       },
 
+      // Delete Logic: Isse mission list se saaf ho jayega
       deleteHabit: async (habitId) => {
         const updatedHabits = get().habits.filter(h => h.id !== habitId);
         set({ habits: updatedHabits });
