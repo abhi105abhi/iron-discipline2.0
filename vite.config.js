@@ -7,25 +7,17 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      // Abhi ke liye icons hata rahe hain jab tak tu images add nahi karta
       manifest: {
         name: 'Iron Discipline',
         short_name: 'IronDisc',
-        description: 'Masculine Performance Portal for Warriors',
+        description: 'Masculine Performance Portal',
         theme_color: '#000000',
         background_color: '#000000',
-        icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
+        icons: [] // Empty rakho abhi
       }
     })
   ],
