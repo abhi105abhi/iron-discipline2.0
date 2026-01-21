@@ -1,46 +1,12 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { db } from '../firebase';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+// ... existing imports
 
 export const useHabitStore = create(
   persist(
     (set, get) => ({
-      habits: [
-        { id: '1', name: 'Cold Shower', completedDays: [] },
-        { id: '2', name: 'Deep Work (4 Hours)', completedDays: [] },
-        { id: '3', name: '5 AM Wakeup', completedDays: [] }
-      ],
-      userProfile: {
-        uid: null,
-        joinDate: new Date().toISOString(),
-        isPremium: false,
-        trialEnded: false
-      },
+      // ... existing state (habits, userProfile)
 
-      setUserId: (uid) => set((state) => ({
-        userProfile: { ...state.userProfile, uid }
-      })),
-
-      // Habits ko toggle karna aur Firebase pe sync karna
-      toggleHabit: async (habitId, date) => {
-        const currentHabits = get().habits;
-        const updatedHabits = currentHabits.map(habit => {
-          if (habit.id === habitId) {
-            const isCompleted = habit.completedDays.includes(date);
-            return {
-              ...habit,
-              completedDays: isCompleted 
-                ? habit.completedDays.filter(d => d !== date)
-                : [...habit.completedDays, date]
-            };
-          }
-          return habit;
-        });
-
-        set({ habits: updatedHabits });
-
-        // Firebase Sync logic
+      // Generic sync function for cleaner code
+      syncToFirebase: async (updatedHabits) => {
         const { uid } = get().userProfile;
         if (uid) {
           try {
@@ -49,28 +15,29 @@ export const useHabitStore = create(
               lastUpdated: new Date().toISOString()
             }, { merge: true });
           } catch (error) {
-            console.error("Sync Error:", error);
+            console.error("Firebase Sync Error:", error);
           }
         }
       },
 
-      // Elite Warrior Templates pick karne ke liye
-      addFromTemplate: (templateName) => {
+      // Updated Add Habit with Sync
+      addHabit: async (name) => {
         const newHabit = {
           id: Date.now().toString(),
-          name: templateName,
+          name: name.toUpperCase(), // Warrior style: All Caps
           completedDays: []
         };
-        set((state) => ({ habits: [...state.habits, newHabit] }));
+        const updatedHabits = [...get().habits, newHabit];
+        set({ habits: updatedHabits });
+        await get().syncToFirebase(updatedHabits);
       },
 
-      checkTrialStatus: () => {
-        const { joinDate, isPremium } = get().userProfile;
-        const diffInDays = Math.floor((new Date() - new Date(joinDate)) / (1000 * 60 * 60 * 24));
-        if (diffInDays > 15 && !isPremium) {
-          set((state) => ({ userProfile: { ...state.userProfile, trialEnded: true } }));
-        }
+      // Templates add karte waqt bhi sync hoga
+      addFromTemplate: async (templateName) => {
+        await get().addHabit(templateName);
       },
+
+      // ... toggleHabit should also use get().syncToFirebase(updatedHabits)
     }),
     { name: 'iron-discipline-storage' }
   )
