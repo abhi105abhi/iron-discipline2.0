@@ -7,10 +7,10 @@ import ProgressOrbit from './components/ProgressOrbit';
 import Heatmap from './components/Heatmap';
 import WarriorTemplates from './components/WarriorTemplates';
 import Insights from './components/Insights';
-import { Shield, Flame, Lock, User, LayoutDashboard, BarChart3 } from 'lucide-react';
+import { Shield, Flame, Lock, User, LayoutDashboard, BarChart3, Trash2 } from 'lucide-react';
 
 function App() {
-  const { habits, toggleHabit, userProfile, setUserId, checkTrialStatus } = useHabitStore();
+  const { habits, toggleHabit, deleteHabit, userProfile, setUserId, checkTrialStatus } = useHabitStore();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('missions');
   const today = new Date().toISOString().split('T')[0];
@@ -67,7 +67,7 @@ function App() {
         <div className="flex gap-3">
           <div className="bg-iron-800 px-3 py-1 rounded-full border border-iron-700 flex items-center gap-2">
             <Flame className="w-4 h-4 text-orange-500" />
-            <span className="text-xs font-black tracking-tighter">05</span>
+            <span className="text-xs font-black tracking-tighter">{completedToday}</span>
           </div>
           <User className="w-6 h-6 text-iron-500" />
         </div>
@@ -90,13 +90,24 @@ function App() {
             <div className="space-y-4">
               {habits.map(habit => (
                 <div key={habit.id} className="bg-iron-800 border-l-4 border-blood-600 p-4 flex justify-between items-center shadow-xl group hover:bg-iron-700/30 transition-all">
-                  <div className="space-y-3">
-                    <h3 className="font-black uppercase italic tracking-tight text-lg group-hover:text-blood-600 transition-colors">{habit.name}</h3>
+                  <div className="space-y-3 flex-grow">
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-black uppercase italic tracking-tight text-lg group-hover:text-blood-600 transition-colors">{habit.name}</h3>
+                      {/* DELETE BUTTON: Sirf mission tab pe dikhega */}
+                      <button 
+                        onClick={() => {
+                          if(window.confirm(`Warrior, confirm termination of: ${habit.name}?`)) deleteHabit(habit.id)
+                        }}
+                        className="text-iron-700 hover:text-blood-600 p-1 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                     <Heatmap completedDays={habit.completedDays} />
                   </div>
                   <button 
                     onClick={() => toggleHabit(habit.id, today)}
-                    className={`w-14 h-14 flex items-center justify-center border-2 transition-all duration-300 active:scale-90 ${
+                    className={`w-14 h-14 ml-4 flex items-center justify-center border-2 transition-all duration-300 active:scale-90 ${
                       habit.completedDays.includes(today) 
                         ? 'bg-blood-600 border-blood-600 shadow-[0_0_20px_rgba(220,38,38,0.4)]' 
                         : 'border-iron-700 hover:border-blood-600'
@@ -114,7 +125,6 @@ function App() {
         )}
       </main>
 
-      {/* BOTTOM NAVIGATION */}
       <nav className="fixed bottom-0 left-0 w-full bg-iron-900/95 border-t border-iron-800/50 backdrop-blur-xl flex justify-around p-3 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
         <button 
           onClick={() => setActiveTab('missions')}
